@@ -1,0 +1,88 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Board Styling */
+.chess-board {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    grid-template-rows: repeat(8, 1fr);
+    width: 100%;
+    max-width: 800px;
+    aspect-ratio: 1 / 1;
+    border: 8px solid #475569;
+    border-radius: 4px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+.square {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    cursor: pointer;
+}
+
+/* Reverted to classic colorful wood theme */
+.square.white { background-color: #f0d9b5; }
+.square.black { background-color: #b58863; }
+
+.square.selected {
+    background-color: #bbcba2 !important; /* Lime-greenish */
+    box-shadow: inset 0 0 15px rgba(0,0,0,0.2);
+}
+
+.square.highlight {
+    position: relative;
+}
+
+.square.highlight::after {
+    content: '';
+    position: absolute;
+    width: 30%;
+    height: 30%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+}
+
+.square.highlight-capture::after {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border: 4px solid rgba(0, 0, 0, 0.2);
+    border-radius: 50%;
+    background-color: transparent;
+}
+
+.piece {
+    width: 80%;
+    height: 80%;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    transition: transform 0.2s;
+}
+
+.piece:hover {
+    transform: scale(1.1);
+}
+
+/* Captured Pieces */
+.captured-area {
+    min-height: 40px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    padding: 8px;
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.captured-piece {
+    width: 30px;
+    height: 30px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
