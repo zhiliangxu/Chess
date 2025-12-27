@@ -100,14 +100,13 @@ function getBestMove(gameInstance: any, depth: number): string | null {
     const isWhite = aiColor === 'w';
 
     // Simple move ordering: Captures first
-    possibleMoves.sort((a: any, b: any) => {
+    const sortedMoves = possibleMoves.toSorted((a: any, b: any) => {
         if (a.captured && !b.captured) return -1;
         if (!a.captured && b.captured) return 1;
         return 0.5 - Math.random();
     });
 
-    for (let i = 0; i < possibleMoves.length; i++) {
-        const move = possibleMoves[i];
+    for (const move of sortedMoves) {
         gameInstance.move(move);
         const value = minimax(gameInstance, depth - 1, -Infinity, Infinity, !isWhite);
         gameInstance.undo();
@@ -132,8 +131,7 @@ function getBestMove(gameInstance: any, depth: number): string | null {
         }
     }
     
-    if (!bestMove && possibleMoves.length > 0) return possibleMoves[0].san;
-    return bestMove ? bestMove.san : null;
+    return bestMove?.san ?? sortedMoves[0]?.san ?? null;
 }
 
 function App() {
@@ -152,8 +150,7 @@ function App() {
     const board = useMemo(() => game.board(), [fen]);
     const history = useMemo(() => game.history(), [fen]);
     const lastMove = useMemo(() => {
-        const historyVerbose = game.history({ verbose: true });
-        return historyVerbose.length > 0 ? historyVerbose[historyVerbose.length - 1] : null;
+        return game.history({ verbose: true }).findLast(() => true) ?? null;
     }, [fen]);
 
     const evaluation = useMemo(() => evaluateBoard(board), [board]);
@@ -206,7 +203,7 @@ function App() {
         // Select logic
         const piece = game.get(squareName as any);
         // Can only select own pieces
-        if (piece && piece.color === game.turn()) {
+        if (piece?.color === game.turn()) {
             // If user is playing white in AI mode, don't let them select black
             if(gameMode === 'ai' && piece.color !== playerColor) return;
 
@@ -347,8 +344,8 @@ function App() {
                                 const squareName = String.fromCharCode(97 + colIndex) + (8 - rowIndex);
                                 const isWhite = (rowIndex + colIndex) % 2 === 0;
                                 const isSelected = selectedSquare === squareName;
-                                const isLastMove = lastMove && (lastMove.from === squareName || lastMove.to === squareName);
-                                const isSuggested = suggestedMove && (suggestedMove.from === squareName || suggestedMove.to === squareName);
+                                const isLastMove = lastMove?.from === squareName || lastMove?.to === squareName;
+                                const isSuggested = suggestedMove?.from === squareName || suggestedMove?.to === squareName;
                                 const isLegal = legalMoves.find(m => m.to === squareName);
 
                                 return (
@@ -363,7 +360,7 @@ function App() {
                                         onClick={() => handleSquareClick(squareName)}
                                     >
                                         {piece && (
-                                            <div className={`piece ${lastMove && lastMove.to === squareName ? 'animate-pop' : ''}`}>
+                                            <div className={`piece ${lastMove?.to === squareName ? 'animate-pop' : ''}`}>
                                                 <img 
                                                     src={`/pieces/${COLOR_NAMES[piece.color]}_${PIECE_NAMES[piece.type]}.svg`} 
                                                     alt={`${COLOR_NAMES[piece.color]} ${PIECE_NAMES[piece.type]}`}
@@ -493,7 +490,7 @@ function App() {
                                     <div key={i} className="flex border-b border-slate-800/50 py-1.5 hover:bg-slate-800/50 transition-colors px-2">
                                         <div className="w-8 text-slate-600 text-xs font-mono pt-0.5">{i + 1}.</div>
                                         <div className="w-16 text-slate-300 font-bold text-sm">{history[i * 2]}</div>
-                                        <div className="w-16 text-slate-300 font-bold text-sm">{history[i * 2 + 1] || ''}</div>
+                                        <div className="w-16 text-slate-300 font-bold text-sm">{history[i * 2 + 1] ?? ''}</div>
                                     </div>
                                 ))
                             )}
